@@ -21,6 +21,10 @@ build_complete_kernel: assemble_kernel_entry compile_kernel_body assemble_x86 as
 	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
 	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/x86.o" "$(BUILD_DIR)/stdlib.o" --oformat binary
 
+	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).elf" \
+	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
+	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/x86.o" "$(BUILD_DIR)/stdlib.o" --oformat elf32-i386
+
 assemble_x86: make_build_dir
 	$(ASM) "$(SRC)/coreutils/x86.asm" -f elf -o "$(BUILD_DIR)/x86.o"
 
