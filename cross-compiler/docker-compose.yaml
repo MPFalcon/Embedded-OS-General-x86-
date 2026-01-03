@@ -1,0 +1,6 @@
+services:
+  i386-cross:
+    build: .
+    container_name: i386-cross-compiler
+    volumes:
+      - ./out:/out
