@@ -1,6 +1,6 @@
 CROSS_PREFIX := cross-compiler/out/cross/bin/i386-elf
 CC := gcc
-C_FLAGS := -ffreestanding -m32 -g
+C_FLAGS := -ffreestanding -m32 -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls
 LD := ld
 ASM := nasm
 KERNEL := kernel
@@ -11,6 +11,9 @@ SRC := src
 FIRMWARE_FILE := custom_firmware.bin
 FINAL_FILE := embedded_os.bin
 
+EXTRA_FILES= heap_init VGA_init ISR
+EXTRA_FILES_INPUT = $(BUILD_DIR)/heap_init.o $(BUILD_DIR)/VGA_init.o $(BUILD_DIR)/ISR.o
+
 merge_firmware: make_bin_dir build_boot build_complete_kernel
 	dd if=/dev/zero of="$(BUILD_DIR)/zeros.bin" bs=10240 count=1 seek=1 conv=notrunc
 	cat "$(BUILD_DIR)/$(BOOT).bin" "$(BUILD_DIR)/$(KERNEL).bin" > "$(BUILD_DIR)/$(FIRMWARE_FILE)"
@@ -19,15 +22,16 @@ merge_firmware: make_bin_dir build_boot build_complete_kernel
 build_complete_kernel: assemble_kernel_entry compile_kernel_body assemble_extras assemble_std
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).bin" \
 	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
-	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/heap_init.o" "$(BUILD_DIR)/VGA_init.o" "$(BUILD_DIR)/stdlib.o" --oformat binary
+	"$(BUILD_DIR)/$(KERNEL).o" $(EXTRA_FILES_INPUT) "$(BUILD_DIR)/stdlib.o" --oformat binary
 
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).elf" \
 	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
-	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/heap_init.o" "$(BUILD_DIR)/VGA_init.o" "$(BUILD_DIR)/stdlib.o" --oformat elf32-i386
+	"$(BUILD_DIR)/$(KERNEL).o" $(EXTRA_FILES_INPUT) "$(BUILD_DIR)/stdlib.o" --oformat elf32-i386
 
 assemble_extras: make_build_dir
-	$(ASM) "$(SRC)/coreutils/heap_init.asm" -f elf -o "$(BUILD_DIR)/heap_init.o"
-	$(ASM) "$(SRC)/coreutils/VGA_init.asm" -f elf -o "$(BUILD_DIR)/VGA_init.o"
+	@for f in $(EXTRA_FILES); do \
+		$(ASM) "$(SRC)/coreutils/$$f.asm" -f elf -o "$(BUILD_DIR)/$$f.o"; \
+	done
 
 assemble_std: make_build_dir
 	$(CROSS_PREFIX)-$(CC) $(C_FLAGS) -c "$(SRC)/coreutils/stdlib.c" -o "$(BUILD_DIR)/stdlib.o"

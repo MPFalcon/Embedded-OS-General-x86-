@@ -53,8 +53,8 @@ section .text
 ; Initializes all slab free lists
 ; ------------------------------------------------------------
 slab_init:
-    push eax
-    push ecx
+    push ebp
+    mov  ebp, esp
 
     ; init slab32
     mov eax, slab32_mem
@@ -86,8 +86,8 @@ slab_init:
     loop .s128_loop
     mov dword [eax], 0
 
-    pop ecx
-    pop eax
+    mov esp, ebp
+    pop  ebp
     ret
 
 ; ------------------------------------------------------------
@@ -96,6 +96,10 @@ slab_init:
 ; OUT: EAX = pointer or 0
 ; ------------------------------------------------------------
 slab_malloc:
+    push ebp
+    mov  ebp, esp
+
+    mov eax, [ebp+8]
     cmp eax, SLAB32_SIZE
     jbe .alloc32
     cmp eax, SLAB64_SIZE
@@ -103,6 +107,8 @@ slab_malloc:
     cmp eax, SLAB128_SIZE
     jbe .alloc128
     xor eax, eax
+    mov esp, ebp
+    pop  ebp
     ret
 
 .alloc32:
@@ -111,6 +117,8 @@ slab_malloc:
     jz .fail
     mov edx, [eax]
     mov [slab32_free], edx
+    mov esp, ebp
+    pop  ebp
     ret
 
 .alloc64:
@@ -119,6 +127,8 @@ slab_malloc:
     jz .fail
     mov edx, [eax]
     mov [slab64_free], edx
+    mov esp, ebp
+    pop  ebp
     ret
 
 .alloc128:
@@ -127,10 +137,14 @@ slab_malloc:
     jz .fail
     mov edx, [eax]
     mov [slab128_free], edx
+    mov esp, ebp
+    pop  ebp
     ret
 
 .fail:
     xor eax, eax
+    mov esp, ebp
+    pop  ebp
     ret
 
 ; ------------------------------------------------------------
@@ -140,30 +154,45 @@ slab_malloc:
 ;   ECX = original allocation size
 ; ------------------------------------------------------------
 slab_free:
+    push ebp
+    mov  ebp, esp
+
+    mov eax, [ebp+8]
+    mov ecx, [ebp+12]
     cmp ecx, SLAB32_SIZE
     jbe .free32
     cmp ecx, SLAB64_SIZE
     jbe .free64
     cmp ecx, SLAB128_SIZE
     jbe .free128
+    mov esp, ebp
+    pop  ebp
     ret
 
 .free32:
     mov edx, [slab32_free]
     mov [eax], edx
     mov [slab32_free], eax
+    mov esp, ebp
+    pop  ebp
     ret
 
 .free64:
     mov edx, [slab64_free]
     mov [eax], edx
     mov [slab64_free], eax
+    mov esp, ebp
+    pop  ebp
     ret
 
 .free128:
     mov edx, [slab128_free]
     mov [eax], edx
     mov [slab128_free], eax
+    mov esp, ebp
+    pop  ebp
     ret
+
+
 
 ; EOF

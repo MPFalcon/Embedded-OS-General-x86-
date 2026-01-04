@@ -1,7 +1,7 @@
 #ifndef _STDINT_H
     #define _STDINT_H
 
-    #define NULL (void *)(0)
+    #define NULL 0x00000000
 
     typedef signed char int8_t;
     typedef unsigned char uint8_t;

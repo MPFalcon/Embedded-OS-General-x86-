@@ -59,6 +59,7 @@ VGA_Write:
     mov  dword [cursor_row], 0
 
 .done:
+    mov esp, ebp
     pop  ebp
     ret
 

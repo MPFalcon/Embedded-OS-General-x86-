@@ -7,6 +7,11 @@ static void putchar(char chr)
 
 void print(const char * _message)
 {
+    if (NULL == _message)
+    {
+        page_fault_handler();
+    }
+
     while (*_message)
     {
         putchar(*_message);
@@ -18,6 +23,10 @@ void * malloc(uint32_t size)
 {
     void * new_ptr = NULL;
     new_ptr = slab_malloc(size);
+    for (uint32_t idx = 0; idx < size; idx++)
+    {
+        ((uint8_t *)new_ptr)[idx] = 0x00;
+    }
 
     return new_ptr;
 }

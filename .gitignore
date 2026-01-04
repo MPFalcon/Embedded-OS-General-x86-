@@ -3,3 +3,6 @@ build/
 bin/
 cross-compiler/out/
 *.o
+
+.gdbinit
+emulate-debug.sh
