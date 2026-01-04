@@ -2,7 +2,7 @@
 
 static void putchar(char chr)
 {
-    x86_Video_WriteCharTeletype(chr);
+    VGA_Write(chr);
 }
 
 void print(const char * _message)
@@ -12,6 +12,19 @@ void print(const char * _message)
         putchar(*_message);
         _message++;
     }
+}
+
+void * malloc(uint32_t size)
+{
+    void * new_ptr = NULL;
+    new_ptr = slab_malloc(size);
+
+    return new_ptr;
+}
+
+void free(void * ptr, uint32_t size)
+{
+    slab_free(ptr, size);
 }
 
 // EOF

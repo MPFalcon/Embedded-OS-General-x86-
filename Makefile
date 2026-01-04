@@ -16,17 +16,18 @@ merge_firmware: make_bin_dir build_boot build_complete_kernel
 	cat "$(BUILD_DIR)/$(BOOT).bin" "$(BUILD_DIR)/$(KERNEL).bin" > "$(BUILD_DIR)/$(FIRMWARE_FILE)"
 	cat "$(BUILD_DIR)/$(FIRMWARE_FILE)" "$(BUILD_DIR)/zeros.bin" > "$(BIN_DIR)/$(FINAL_FILE)"
 
-build_complete_kernel: assemble_kernel_entry compile_kernel_body assemble_x86 assemble_std
+build_complete_kernel: assemble_kernel_entry compile_kernel_body assemble_extras assemble_std
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).bin" \
 	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
-	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/x86.o" "$(BUILD_DIR)/stdlib.o" --oformat binary
+	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/heap_init.o" "$(BUILD_DIR)/VGA_init.o" "$(BUILD_DIR)/stdlib.o" --oformat binary
 
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).elf" \
 	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
-	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/x86.o" "$(BUILD_DIR)/stdlib.o" --oformat elf32-i386
+	"$(BUILD_DIR)/$(KERNEL).o" "$(BUILD_DIR)/heap_init.o" "$(BUILD_DIR)/VGA_init.o" "$(BUILD_DIR)/stdlib.o" --oformat elf32-i386
 
-assemble_x86: make_build_dir
-	$(ASM) "$(SRC)/coreutils/x86.asm" -f elf -o "$(BUILD_DIR)/x86.o"
+assemble_extras: make_build_dir
+	$(ASM) "$(SRC)/coreutils/heap_init.asm" -f elf -o "$(BUILD_DIR)/heap_init.o"
+	$(ASM) "$(SRC)/coreutils/VGA_init.asm" -f elf -o "$(BUILD_DIR)/VGA_init.o"
 
 assemble_std: make_build_dir
 	$(CROSS_PREFIX)-$(CC) $(C_FLAGS) -c "$(SRC)/coreutils/stdlib.c" -o "$(BUILD_DIR)/stdlib.o"

@@ -1,23 +1,21 @@
 [BITS 32]
-[global x86_Video_WriteCharTeletype]
-[global malloc]
-[global init_sys]
+[global VGA_Write]
+[global init_VGA]
 
-VGA_LIMIT equ 0xf00
-VGA_BASE equ 0xB8000
-VGA_COLS equ 0xA0 ; 80 0x50
-VGA_ROWS equ 0x30 ; 25 0x19
-ATTR     equ 0x0F
-
+; VGA (Screen) Constants
+%define VGA_LIMIT 0xf00
+%define VGA_BASE 0xB8000
+%define VGA_COLS 0xA0
+%define VGA_ROWS 0x30
+%define ATTR     0x0F
 
 section .bss
+; VGA Cursors
 cursor_row:  resd 1
 cursor_col:  resd 1
-heap_start:  resb 0x1000   ; 4 KB heap (reserved memory)
-heap_ptr:    resd 1        ; pointer to next free byte
 
 section .text
-x86_Video_WriteCharTeletype:
+VGA_Write:
     push ebp
     mov  ebp, esp
     mov  al, [ebp+8]      ; character
@@ -64,27 +62,9 @@ x86_Video_WriteCharTeletype:
     pop  ebp
     ret
 
-malloc:
-    push ebx
-    push ecx
-
-    mov ebx, [heap_ptr]    ; current heap pointer
-    mov ecx, eax           ; requested size
-
-    add eax, ebx           ; calculate new pointer after allocation
-    mov [heap_ptr], eax    ; bump the heap pointer
-
-    mov eax, ebx           ; return old pointer as allocated block
-
-    pop ecx
-    pop ebx
-    ret
-
-init_sys:
+init_VGA:
     mov dword [cursor_col], 0
     mov dword [cursor_row], 0
-    mov eax, heap_start    ; start of heap
-    mov [heap_ptr], eax
     ret
 
 ; EOF
