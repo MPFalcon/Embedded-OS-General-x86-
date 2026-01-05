@@ -17,48 +17,22 @@ int main()
 
     char * mem = (char *)malloc(6);
 
-    mem[0] = 'H';
-    mem[1] = 'i';
-    mem[2] = ' ';
-    mem[3] = 'H';
-    mem[4] = 'o';
-    mem[5] = '\0';
+    for (int idx = 0; idx < 30; idx++)
+    {
+        mem[0] = 'H';
+        mem[1] = 'i';
+        mem[2] = ' ';
+        mem[3] = 'H';
+        mem[4] = 'o';
+        mem[5] = '\0';
 
-    print(mem);
+        print(mem);
 
-    free(mem, 6);
-    mem = NULL;
+        free(mem, 6);
+        mem = NULL;
 
-    // mem[0] = 'F';
-    // mem[1] = 'i';
-    // mem[2] = ' ';
-    // mem[3] = 'F';
-    // mem[4] = 'o';
-    // mem[5] = '\0';
-
-    print(mem);
-
-    // free(mem, 6);
-    // mem = NULL;
-
-    // mem = (char *)malloc(6);
-
-    // for (int idx = 0; idx < 30; idx++)
-    // {
-    //     mem[0] = 'H';
-    //     mem[1] = 'i';
-    //     mem[2] = ' ';
-    //     mem[3] = 'H';
-    //     mem[4] = 'o';
-    //     mem[5] = '\0';
-
-    //     print(mem);
-
-    //     free(mem, 6);
-    //     mem = NULL;
-
-    //     mem = (char *)malloc(6);
-    // }
+        mem = (char *)malloc(6);
+    }
 
     return 0;
 }

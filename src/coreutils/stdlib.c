@@ -17,7 +17,7 @@ void initiate_fault(void)
     }
     for (;;)
     {
-        __asm__ volatile ("hlt");
+        __asm__ volatile ("cli");
     }
 }
 
