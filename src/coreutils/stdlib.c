@@ -5,11 +5,27 @@ static void putchar(char chr)
     VGA_Write(chr);
 }
 
+void initiate_fault(void)
+{
+    const char * _message = "** Segmentation Fault **";
+    page_fault_handler();
+    init_VGA();
+    while (*_message)
+    {
+        putchar(*_message);
+        _message++;
+    }
+    for (;;)
+    {
+        __asm__ volatile ("hlt");
+    }
+}
+
 void print(const char * _message)
 {
     if (NULL == _message)
     {
-        page_fault_handler();
+        initiate_fault();
     }
 
     while (*_message)

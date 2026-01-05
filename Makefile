@@ -2,6 +2,7 @@ CROSS_PREFIX := cross-compiler/out/cross/bin/i386-elf
 CC := gcc
 C_FLAGS := -ffreestanding -m32 -O0 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls
 LD := ld
+LD_SCRIPT := linker
 ASM := nasm
 KERNEL := kernel
 BOOT := boot
@@ -21,11 +22,11 @@ merge_firmware: make_bin_dir build_boot build_complete_kernel
 
 build_complete_kernel: assemble_kernel_entry compile_kernel_body assemble_extras assemble_std
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).bin" \
-	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
+	-T $(SRC)/$(LD_SCRIPT).ld "$(BUILD_DIR)/$(KERNEL)_entry.o" \
 	"$(BUILD_DIR)/$(KERNEL).o" $(EXTRA_FILES_INPUT) "$(BUILD_DIR)/stdlib.o" --oformat binary
 
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).elf" \
-	-Ttext 0x1000 "$(BUILD_DIR)/$(KERNEL)_entry.o" \
+	-T $(SRC)/$(LD_SCRIPT).ld "$(BUILD_DIR)/$(KERNEL)_entry.o" \
 	"$(BUILD_DIR)/$(KERNEL).o" $(EXTRA_FILES_INPUT) "$(BUILD_DIR)/stdlib.o" --oformat elf32-i386
 
 assemble_extras: make_build_dir

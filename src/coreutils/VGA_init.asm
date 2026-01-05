@@ -1,6 +1,6 @@
 [BITS 32]
-[global VGA_Write]
 [global init_VGA]
+[global VGA_Write]
 
 ; VGA (Screen) Constants
 %define VGA_LIMIT 0xf00
@@ -42,30 +42,36 @@ VGA_Write:
     cmp  dword [cursor_col], (VGA_COLS * 2)
     jl   .done
 
-.newline:
-    mov  dword [cursor_col], 0
-    inc  dword [cursor_row]
-    jmp  .scroll_check
+    .newline:
+        mov  dword [cursor_col], 0
+        inc  dword [cursor_row]
+        jmp  .scroll_check
 
-.carriage:
-    mov  dword [cursor_col], 0
-    jmp  .done
+    .carriage:
+        mov  dword [cursor_col], 0
+        jmp  .done
 
-.scroll_check:
-    cmp  dword [cursor_row], VGA_ROWS
-    jl   .done
+    .scroll_check:
+        cmp  dword [cursor_row], VGA_ROWS
+        jl   .done
 
-    ; simple wrap (no scrolling yet)
-    mov  dword [cursor_row], 0
+        ; simple wrap (no scrolling yet)
+        mov  dword [cursor_row], 0
 
-.done:
-    mov esp, ebp
-    pop  ebp
-    ret
+    .done:
+        mov esp, ebp
+        pop  ebp
+        ret
 
 init_VGA:
+    push ebp
+    mov  ebp, esp
+    
     mov dword [cursor_col], 0
     mov dword [cursor_row], 0
+    
+    mov esp, ebp
+    pop  ebp
     ret
 
 ; EOF
