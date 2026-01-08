@@ -35,6 +35,9 @@ void print(const char * _message)
     }
 }
 
+// void memset(void * _ptr, uint8_t byte, uint32_t size)
+// {}
+
 void * malloc(uint32_t size)
 {
     void * new_ptr = NULL;

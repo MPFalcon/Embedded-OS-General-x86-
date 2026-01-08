@@ -16,9 +16,9 @@ EXTRA_FILES= heap_init VGA_init ISR
 EXTRA_FILES_INPUT = $(BUILD_DIR)/heap_init.o $(BUILD_DIR)/VGA_init.o $(BUILD_DIR)/ISR.o
 
 merge_firmware: make_bin_dir build_boot build_complete_kernel
-	dd if=/dev/zero of="$(BUILD_DIR)/zeros.bin" bs=10240 count=1 seek=1 conv=notrunc
+	dd if=/dev/zero of="$(BIN_DIR)/$(FINAL_FILE)" bs=1 count=4198400 status=progress
 	cat "$(BUILD_DIR)/$(BOOT).bin" "$(BUILD_DIR)/$(KERNEL).bin" > "$(BUILD_DIR)/$(FIRMWARE_FILE)"
-	cat "$(BUILD_DIR)/$(FIRMWARE_FILE)" "$(BUILD_DIR)/zeros.bin" > "$(BIN_DIR)/$(FINAL_FILE)"
+	dd if="$(BUILD_DIR)/$(FIRMWARE_FILE)" of="$(BIN_DIR)/$(FINAL_FILE)" bs=1 conv=notrunc status=progress
 
 build_complete_kernel: assemble_kernel_entry compile_kernel_body assemble_extras assemble_std
 	$(CROSS_PREFIX)-$(LD) -o "$(BUILD_DIR)/$(KERNEL).bin" \
